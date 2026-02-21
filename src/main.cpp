@@ -1,18 +1,47 @@
 #include <Arduino.h>
+#include <WiFi.h>
+#include <AsyncTCP.h>
+#include <ESPAsyncWebServer.h>
+#include <LittleFS.h>
 
-// put function declarations here:
-int myFunction(int, int);
+#define SERIAL_BAUD_RATE 115200
+
+const char* ssid = "";
+const char* password = "";
+
+AsyncWebServer server(80);
 
 void setup() {
-  // put your setup code here, to run once:
-  int result = myFunction(2, 3);
+  Serial.begin(SERIAL_BAUD_RATE);
+
+  if (!LittleFS.begin(true)){
+    Serial.println("LittleFS Mount Failed");
+    return;
+  }
+
+  WiFi.begin(ssid, password);
+  while (WiFi.status() != WL_CONNECTED) {
+    delay(1000);
+    Serial.println("Connecting to WiFi..");
+  }
+
+  Serial.println(WiFi.localIP());
+
+  // Serving static
+  server.serveStatic("/js/", LittleFS, "/www/js/");
+
+  // Process all other GET requests with index.html
+  server.onNotFound([](AsyncWebServerRequest* request) {
+    if (request->method() == HTTP_GET) {
+      request->send(LittleFS, "/www/index.html");
+    } else if (request->method() == HTTP_OPTIONS) {
+      request->send(200);
+    } else {
+      request->send(404);
+    }
+  });
+
 }
 
 void loop() {
-  // put your main code here, to run repeatedly:
-}
-
-// put function definitions here:
-int myFunction(int x, int y) {
-  return x + y;
 }
