@@ -1,3 +1,5 @@
 .pio
 .vscode
 /data/www
+/frontend/node_modules
+/frontend/dist

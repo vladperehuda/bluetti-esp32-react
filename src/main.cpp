@@ -29,6 +29,7 @@ void setup() {
 
   // Serving static
   server.serveStatic("/js/", LittleFS, "/www/js/");
+  server.serveStatic("/favicon.ico", LittleFS, "/www/favicon.ico");
 
   // Process all other GET requests with index.html
   server.onNotFound([](AsyncWebServerRequest* request) {
@@ -40,7 +41,9 @@ void setup() {
       request->send(404);
     }
   });
+  
 
+  server.begin();
 }
 
 void loop() {
