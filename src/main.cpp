@@ -4,7 +4,7 @@
 #include <ESPAsyncWebServer.h>
 #include <LittleFS.h>
 #include "services/APService.h"
-#include "controllers/APController.h"
+// #include "controllers/APController.h"
 
 #define SERIAL_BAUD_RATE 115200
 
@@ -13,7 +13,7 @@ const char* password = "";
 
 AsyncWebServer server(80);
 APService apService;
-APController apController(apService);
+// APController apController(apService);
 
 void setup() {
   Serial.begin(SERIAL_BAUD_RATE);
@@ -25,9 +25,7 @@ void setup() {
   }
 
   // Initialize AP Service
-  if (!apService.begin()) {
-    Serial.println("[MAIN] Failed to initialize AP Service");
-  }
+  apService.begin();
 
   // Connect to WiFi if credentials are provided
   if (strlen(ssid) > 0) {
@@ -49,7 +47,7 @@ void setup() {
   }
 
   // Register API routes
-  apController.registerRoutes(server);
+  // apController.registerRoutes(server);
   
   // Serving static
   server.serveStatic("/js/", LittleFS, "/www/js/");
@@ -71,4 +69,5 @@ void setup() {
 }
 
 void loop() {
+  apService.loop();
 }
