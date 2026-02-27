@@ -2,15 +2,14 @@
 #define AP_SERVICE_H
 #include <DNSServer.h>
 #include <WiFi.h>
-
-#include "../utils/PreferencesManager.h"
+#include <Preferences.h>
 
 #ifndef FACTORY_AP_PROVISION_MODE
 #define FACTORY_AP_PROVISION_MODE AP_MODE_DISCONNECTED
 #endif
 
 #ifndef FACTORY_AP_SSID
-#define FACTORY_AP_SSID "bluetti-esp32-#{unique_id}"
+#define FACTORY_AP_SSID "bluetti-esp32"
 #endif
 
 #ifndef FACTORY_AP_PASSWORD

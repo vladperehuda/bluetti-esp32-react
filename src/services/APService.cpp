@@ -3,14 +3,24 @@
 APService::APService() 
     : _ssid(FACTORY_AP_SSID),
       _password(FACTORY_AP_PASSWORD),
-      _provisionMode(FACTORY_AP_PROVISION_MODE) {
+      _provisionMode(FACTORY_AP_PROVISION_MODE),
+      _dnsServer(nullptr),
+      _lastManagedAP(0),
+      _forceReconfigureAP(false) {
 }
 
 void APService::begin() {
     loadSettings();
+    reconfigureAP();
 }
 
 void APService::loop() {
+    unsigned long currentMillis = millis();
+    unsigned long manageElapsed = (unsigned long)(currentMillis - _lastManagedAP);
+    if (manageElapsed >= MANAGE_NETWORK_DELAY) {
+        _lastManagedAP = currentMillis;
+        manageAP();
+    }
     handleDNS();
 }
 
@@ -40,10 +50,10 @@ void APService::startAP() {
     if (!_dnsServer) {
         IPAddress apIp = WiFi.softAPIP();
 
-        Serial.println(F("[APService] SSID: "));
-        Serial.print(_ssid);
-        Serial.println(F("[APService] IP: "));
-        Serial.print(apIp);
+        Serial.print(F("[APService] SSID: "));
+        Serial.println(_ssid);
+        Serial.print(F("[APService] IP: "));
+        Serial.println(apIp);
 
         _dnsServer = new DNSServer;
         _dnsServer->start(DNS_PORT, "*", apIp);
@@ -69,7 +79,8 @@ void APService::handleDNS() {
 }
 
 void APService::loadSettings() {
-    PreferencesManager& prefs = PreferencesManager::getInstance();
+    Preferences prefs;
+
     prefs.begin(AP_PREF_NAMESPACE, false);
     
     _ssid = prefs.getString(AP_PREF_KEY_SSID, FACTORY_AP_SSID);

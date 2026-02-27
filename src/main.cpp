@@ -8,9 +8,6 @@
 
 #define SERIAL_BAUD_RATE 115200
 
-const char* ssid = "";
-const char* password = "";
-
 AsyncWebServer server(80);
 APService apService;
 // APController apController(apService);
@@ -24,27 +21,15 @@ void setup() {
     return;
   }
 
+  // Initialize WiFi driver
+  WiFi.mode(WIFI_OFF);
+  WiFi.persistent(false);
+  WiFi.setAutoReconnect(false);
+  WiFi.mode(WIFI_MODE_MAX);
+  WiFi.mode(WIFI_MODE_NULL);
+
   // Initialize AP Service
   apService.begin();
-
-  // Connect to WiFi if credentials are provided
-  if (strlen(ssid) > 0) {
-    WiFi.begin(ssid, password);
-    Serial.println("[MAIN] Connecting to WiFi...");
-    
-    int attempts = 0;
-    while (WiFi.status() != WL_CONNECTED && attempts < 20) {
-      delay(500);
-      Serial.print(".");
-      attempts++;
-    }
-    
-    if (WiFi.status() == WL_CONNECTED) {
-      Serial.printf("\n[MAIN] WiFi Connected. IP: %s\n", WiFi.localIP().toString().c_str());
-    } else {
-      Serial.println("\n[MAIN] WiFi connection failed");
-    }
-  }
 
   // Register API routes
   // apController.registerRoutes(server);
